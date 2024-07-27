@@ -18,6 +18,7 @@
 """
 Product Store Service with UI
 """
+from decimal import Decimal
 from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
 from service.models import Product, Category
@@ -105,6 +106,7 @@ def list_products():
     name = request.args.get("name")
     category = request.args.get("category")
     available = request.args.get("available")
+    price = request.args.get("price")
 
     if name:
         app.logger.info("Find by name: %s", name)
@@ -119,6 +121,10 @@ def list_products():
         # create bool from string
         available_value = available.lower() in ["true", "yes", "1"]
         products = Product.find_by_availability(available_value)
+    elif price:
+        app.logger.info("Find by price: %s", price)
+        price_value = Decimal(price.strip(' "'))
+        products = Product.find_by_price(price_value)
     else:
         app.logger.info("Find all")
         products = Product.all()
